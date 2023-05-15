@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 n_servidores = 3
 filas = np.zeros(n_servidores)
@@ -8,9 +9,19 @@ s = np.array([0.125, 0.3 , 0.2]) # tempo de serviço
 q = 0 # número médio de jobs
 z = 4 # tempo de pensar
 n = 1 #número da iteração
-n_max = 3 #número máximo de iterações
 
-while (n != n_max+1):
+verificador = False # True quando o valor da utilização passa 80% em um dos servidores
+
+results_utilizacao = [] #lista para armazenar as utilizações dos servidores
+results_tamFilas = [] #lista para armazenar o tamanho das filas dos servidores
+
+def check(lista):
+    for i in range(n_servidores):
+        if(lista[i] >= 0.80): 
+            return True 
+    return False
+
+while (verificador == False):
     
     n_jobs = np.zeros(n_servidores)
     utilizacao = np.zeros(n_servidores) 
@@ -44,6 +55,22 @@ while (n != n_max+1):
     print("Tamanho das filas:" + str(filas))
     print()
 
+    verificador = check(utilizacao)
+
+    if(verificador):
+        print("SERVIDOR ATINGIU 80%!!!")
+        print()
+    results_utilizacao.append(utilizacao)
+    results_tamFilas.append(filas)
+
     n = n+1
 
-
+#Exibir tabela de utilização e tamanho das filas
+df = pd.DataFrame()
+df['Utilizacao'] = results_utilizacao
+df[['U1', 'U2', 'U3']] = df['Utilizacao'].apply(lambda x: pd.Series(x))
+df['Filas'] = results_utilizacao
+df[['Q1', 'Q2', 'Q3']] = df['Filas'].apply(lambda x: pd.Series(x))
+df = df.drop(['Utilizacao', 'Filas'], axis=1)
+print('TABELA DE UTILIZAÇÃO E TAMANHO DE FILAS POR ITERAÇÃO')
+print(df)

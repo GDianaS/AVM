@@ -14,6 +14,7 @@ verificador = False # True quando o valor da utilização passa 80% em um dos se
 
 results_utilizacao = [] #lista para armazenar as utilizações dos servidores
 results_tamFilas = [] #lista para armazenar o tamanho das filas dos servidores
+results_resposta = [] #lista para armazenar o tempo de resposta
 
 def check(lista):
     for i in range(n_servidores):
@@ -30,7 +31,7 @@ while (verificador == False):
     tempo_resposta_sistema = 0
 
     for i in range(n_servidores):
-        tempo_resposta[i] = s[i]*(1 + filas[i]) 
+        tempo_resposta[i] = round((s[i]*(1 + filas[i])), 4) 
         
     for i in range(n_servidores):
         tempo_resposta_sistema = tempo_resposta_sistema + round(((tempo_resposta[i] * v[i])), 4) 
@@ -60,17 +61,16 @@ while (verificador == False):
     if(verificador):
         print("SERVIDOR ATINGIU 80%!!!")
         print()
+    
     results_utilizacao.append(utilizacao)
     results_tamFilas.append(filas)
+    results_resposta.append(tempo_resposta)
 
     n = n+1
 
-#Exibir tabela de utilização e tamanho das filas
+#Exibir tabela de utilização, tamanho das filas e tempo de resposta
 df = pd.DataFrame()
 df['Utilizacao'] = results_utilizacao
-df[['U1', 'U2', 'U3']] = df['Utilizacao'].apply(lambda x: pd.Series(x))
-df['Filas'] = results_utilizacao
-df[['Q1', 'Q2', 'Q3']] = df['Filas'].apply(lambda x: pd.Series(x))
-df = df.drop(['Utilizacao', 'Filas'], axis=1)
-print('TABELA DE UTILIZAÇÃO E TAMANHO DE FILAS POR ITERAÇÃO')
+df['Filas'] = results_tamFilas
+df['Tempo_Resposta'] = results_resposta
 print(df)
